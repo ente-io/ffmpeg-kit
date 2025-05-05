@@ -53,6 +53,6 @@ android {
 dependencies {
     implementation 'androidx.annotation:annotation:1.5.0'
     // implementation 'com.arthenica:ffmpeg-kit-full-gpl:6.0-2'
-    implementation(group: 'com.arthenica', name:'ffmpeg-kit-custom', version: '+')
-    implementation(group: 'com.arthenica', name:'smart-exception-java', version: '+')
+    implementation(group: 'com.arthenica', name:'ffmpeg-kit-custom', version: '6.0-2')
+    implementation(group: 'com.arthenica', name:'smart-exception-java', version: '0.2.1')
 }
