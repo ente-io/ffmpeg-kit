@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <!-- This module was also published with a richer model, Gradle metadata,  -->
+  <!-- which should be used instead. Do not delete the following line which  -->
+  <!-- is to indicate to Gradle or any Gradle module metadata file consumer  -->
+  <!-- that they should prefer consuming it instead. -->
+  <!-- do_not_remove: published-with-gradle-metadata -->
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.arthenica</groupId>
+  <artifactId>ffmpeg-kit-custom</artifactId>
+  <version>6.0-2</version>
+  <packaging>aar</packaging>
+  <name>ffmpeg-kit-custom</name>
+  <description>Includes FFmpeg with gmp and gnutls libraries enabled.</description>
+  <url>https://github.com/ente-io/ffmpeg-kit</url>
+  <licenses>
+    <license>
+      <name>GNU  General Public License, Version 3</name>
+      <url>https://www.gnu.org/licenses/gpl-3.0.txt</url>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <id>ente-io</id>
+      <name>ENTE IO DEVELOPERS</name>
+      <email>hello@ente.io</email>
+    </developer>
+  </developers>
+  <scm>
+    <connection>https://github.com/ente-io/ffmpeg-kit.git</connection>
+    <developerConnection>https://github.com/ente-io/ffmpeg-kit.git</developerConnection>
+    <url>https://github.com/ente-io/ffmpeg-kit</url>
+  </scm>
+  <dependencies>
+    <dependency>
+      <groupId>com.arthenica</groupId>
+      <artifactId>smart-exception-java</artifactId>
+      <version>0.2.1</version>
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
+</project>

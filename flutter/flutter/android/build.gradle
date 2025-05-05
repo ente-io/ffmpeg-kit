@@ -49,5 +49,6 @@ android {
 
 dependencies {
     implementation 'androidx.annotation:annotation:1.5.0'
-    implementation 'com.arthenica:ffmpeg-kit-full-gpl:6.0-2'
+    // implementation 'com.arthenica:ffmpeg-kit-full-gpl:6.0-2'
+    implementation fileTree(include: ['*.jar', '*.aar'], dir: 'libs')
 }
