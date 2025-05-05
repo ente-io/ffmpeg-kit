@@ -40,7 +40,7 @@ jobs:
           unzip -q -o ndk.zip -d .ndk
           echo "ANDROID_NDK_ROOT=$PWD/.ndk/$(ls .ndk)" >> $GITHUB_ENV
       - name: run the build script
-        run: ./android.sh --full --enable-gpl --disable-lib-srt --disable-arm-v7a
+        run: ./android.sh --enable-gpl --enable-android-zlib --enable-openssl --enable-zimg --enable-x264
       - name: Upload Release Asset (.integrity)
         id: upload-release-asset-integrity
         uses: ncipollo/release-action@v1
