@@ -55,7 +55,6 @@ class FFmpegKitInitializer {
       _initialized = true;
       await _instance._initialize();
     }
-    _instance._updateEventSubscription();
     return _initialized;
   }
 
@@ -311,6 +310,8 @@ class FFmpegKitInitializer {
   Future<void> _initialize() async {
     print("Loading ffmpeg-kit-flutter.");
 
+    await _instance._updateEventSubscription();
+
     final logLevel = await _getLogLevel();
     if (logLevel != null) {
       FFmpegKitConfig.setLogLevel(logLevel);
@@ -326,8 +327,8 @@ class FFmpegKitInitializer {
     print("Loaded ffmpeg-kit-flutter-$fullVersion.");
   }
 
-  void _updateEventSubscription() {
-    _eventSubscription?.cancel();
+  Future<void> _updateEventSubscription() async {
+    await _eventSubscription?.cancel();
     _eventSubscription = _eventChannel
         .receiveBroadcastStream()
         .listen(_onEvent, onError: _onError);
