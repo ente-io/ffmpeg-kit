@@ -49,7 +49,7 @@ class FFmpegKitInitializer {
 
   static bool _initialized = false;
   StreamSubscription? _eventSubscription;
-  
+
   static Future<bool> initialize() async {
     if (!_initialized) {
       _initialized = true;
@@ -327,9 +327,9 @@ class FFmpegKitInitializer {
   }
 
   void _updateEventSubscription() {
-    final subscription = _eventSubscription;
-    _eventSubscription = _eventChannel.receiveBroadcastStream().listen(_onEvent,
-        onError: _onError);
-    subscription?.cancel();
+    _eventSubscription?.cancel();
+    _eventSubscription = _eventChannel
+        .receiveBroadcastStream()
+        .listen(_onEvent, onError: _onError);
   }
 }
