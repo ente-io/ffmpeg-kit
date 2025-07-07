@@ -50,12 +50,14 @@ class FFmpegKitInitializer {
   static bool _initialized = false;
   StreamSubscription? _eventSubscription;
 
-  static Future<bool> initialize() async {
+  static Future<bool> initialize([bool refresh = false]) async {
+    if (!_initialized || refresh) {
+      _instance._updateEventSubscription();
+    }
     if (!_initialized) {
       _initialized = true;
       await _instance._initialize();
     }
-    _instance._updateEventSubscription();
     return _initialized;
   }
 
@@ -326,8 +328,8 @@ class FFmpegKitInitializer {
     print("Loaded ffmpeg-kit-flutter-$fullVersion.");
   }
 
-  void _updateEventSubscription() {
-    _eventSubscription?.cancel();
+  Future<void> _updateEventSubscription() async {
+    await _eventSubscription?.cancel();
     _eventSubscription = _eventChannel
         .receiveBroadcastStream()
         .listen(_onEvent, onError: _onError);

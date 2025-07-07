@@ -46,8 +46,8 @@ class FFmpegKitConfig {
   static int _activeLogLevel = Level.avLogTrace;
 
   /// Initializes the library asynchronously.
-  static Future<void> init() async {
-    await FFmpegKitInitializer.initialize();
+  static Future<void> init([bool refresh = false]) async {
+    await FFmpegKitInitializer.initialize(refresh);
   }
 
   /// Enables log and statistics redirection.
@@ -218,9 +218,10 @@ class FFmpegKitConfig {
   }
 
   /// Synchronously executes the FFmpeg session provided.
-  static Future<void> ffmpegExecute(FFmpegSession ffmpegSession) async {
+  static Future<void> ffmpegExecute(
+      FFmpegSession ffmpegSession, bool refresh) async {
     try {
-      await init();
+      await init(refresh);
       return _platform
           .ffmpegKitConfigFFmpegExecute(ffmpegSession.getSessionId());
     } on PlatformException catch (e, stack) {
