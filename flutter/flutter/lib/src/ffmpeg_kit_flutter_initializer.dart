@@ -313,8 +313,6 @@ class FFmpegKitInitializer {
   Future<void> _initialize() async {
     print("Loading ffmpeg-kit-flutter.");
 
-    await _instance._updateEventSubscription();
-
     final logLevel = await _getLogLevel();
     if (logLevel != null) {
       FFmpegKitConfig.setLogLevel(logLevel);
