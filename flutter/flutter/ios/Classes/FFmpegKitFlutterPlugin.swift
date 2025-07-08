@@ -270,7 +270,7 @@ public class FFmpegKitFlutterPlugin: NSObject, FlutterPlugin, FlutterStreamHandl
       Self.isValidPositiveNumber(value: timeout)
       ? timeout!.int32Value : AbstractSessionDefaultTimeoutForAsynchronousMessagesInTransmit
     let allLogs = session.getAllLogs(withTimeout: timeoutValue)
-    result(Self.toLogArray(logs: allLogs))
+    result(Self.toLogArray(logs: allLogs ?? []))
   }
 
   private func ffmpegSession(arguments: [Any], result: @escaping FlutterResult) {
