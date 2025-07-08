@@ -268,7 +268,7 @@ public class FFmpegKitFlutterPlugin: NSObject, FlutterPlugin, FlutterStreamHandl
     }
     let timeoutValue =
       Self.isValidPositiveNumber(value: timeout)
-      ? timeout!.intValue : Int(AbstractSessionDefaultTimeoutForAsynchronousMessagesInTransmit)
+      ? timeout!.int32Value : AbstractSessionDefaultTimeoutForAsynchronousMessagesInTransmit
     let allLogs = session.getAllLogs(withTimeout: timeoutValue)
     result(Self.toLogArray(logs: allLogs))
   }
@@ -293,7 +293,7 @@ public class FFmpegKitFlutterPlugin: NSObject, FlutterPlugin, FlutterStreamHandl
     result(Self.toSessionDictionary(session: session))
   }
 
-  private func getMediaInformation(sessionId: Int, result: @escaping FlutterResult) {
+  private func getMediaInformation(sessionId: NSNumber, result: @escaping FlutterResult) {
     guard let session = FFmpegKitConfig.getSession(sessionId.intValue) as? AbstractSession else {
       result(FlutterError(code: "SESSION_NOT_FOUND", message: "Session not found.", details: nil))
       return
