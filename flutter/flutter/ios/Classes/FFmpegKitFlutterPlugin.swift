@@ -147,8 +147,8 @@ public class FFmpegKitFlutterPlugin: NSObject, FlutterPlugin, FlutterStreamHandl
 
   public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
     let arguments = call.arguments as? [String: Any]
-    let sessionId = (arguments?[argumentSessionId] as? NSNumber)?.intValue
-    let waitTimeout = (arguments?[argumentWaitTimeout] as? NSNumber)?.intValue
+    let sessionId = arguments?[argumentSessionId] as? NSNumber
+    let waitTimeout = arguments?[argumentWaitTimeout] as? NSNumber
     let argumentsArray = arguments?[argumentArguments] as? [Any]
     let ffprobeJsonOutput = arguments?[argumentFfprobeJsonOutput] as? String
 
@@ -240,7 +240,7 @@ public class FFmpegKitFlutterPlugin: NSObject, FlutterPlugin, FlutterStreamHandl
 
   // MARK: - Session Methods
   private func abstractSessionGetEndTime(sessionId: NSNumber, result: @escaping FlutterResult) {
-    guard let session = FFmpegKitConfig.getSession(sessionId) as? AbstractSession else {
+    guard let session = FFmpegKitConfig.getSession(sessionId.intValue) as? AbstractSession else {
       result(FlutterError(code: "SESSION_NOT_FOUND", message: "Session not found.", details: nil))
       return
     }
@@ -251,8 +251,8 @@ public class FFmpegKitFlutterPlugin: NSObject, FlutterPlugin, FlutterStreamHandl
     }
   }
 
-  private func abstractSessionGetDuration(sessionId: Int, result: @escaping FlutterResult) {
-    guard let session = FFmpegKitConfig.getSession(sessionId) as? AbstractSession else {
+  private func abstractSessionGetDuration(sessionId: NSNumber, result: @escaping FlutterResult) {
+    guard let session = FFmpegKitConfig.getSession(sessionId.intValue) as? AbstractSession else {
       result(FlutterError(code: "SESSION_NOT_FOUND", message: "Session not found.", details: nil))
       return
     }
@@ -260,15 +260,15 @@ public class FFmpegKitFlutterPlugin: NSObject, FlutterPlugin, FlutterStreamHandl
   }
 
   private func abstractSessionGetAllLogs(
-    sessionId: NSNumber, timeout: Int?, result: @escaping FlutterResult
+    sessionId: NSNumber, timeout: NSNumber?, result: @escaping FlutterResult
   ) {
-    guard let session = FFmpegKitConfig.getSession(sessionId) as? AbstractSession else {
+    guard let session = FFmpegKitConfig.getSession(sessionId.intValue) as? AbstractSession else {
       result(FlutterError(code: "SESSION_NOT_FOUND", message: "Session not found.", details: nil))
       return
     }
     let timeoutValue =
       Self.isValidPositiveNumber(value: timeout)
-      ? timeout! : Int(AbstractSessionDefaultTimeoutForAsynchronousMessagesInTransmit)
+      ? timeout!.intValue : Int(AbstractSessionDefaultTimeoutForAsynchronousMessagesInTransmit)
     let allLogs = session.getAllLogs(withTimeout: timeoutValue)
     result(Self.toLogArray(logs: allLogs))
   }
@@ -294,7 +294,7 @@ public class FFmpegKitFlutterPlugin: NSObject, FlutterPlugin, FlutterStreamHandl
   }
 
   private func getMediaInformation(sessionId: Int, result: @escaping FlutterResult) {
-    guard let session = FFmpegKitConfig.getSession(sessionId) as? AbstractSession else {
+    guard let session = FFmpegKitConfig.getSession(sessionId.intValue) as? AbstractSession else {
       result(FlutterError(code: "SESSION_NOT_FOUND", message: "Session not found.", details: nil))
       return
     }
