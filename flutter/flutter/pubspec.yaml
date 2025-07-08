@@ -5,9 +5,11 @@ issue_tracker: https://github.com/arthenica/ffmpeg-kit/issues
 homepage: https://github.com/arthenica/ffmpeg-kit
 version: 6.0.3
 
+publish_to: none
+
 environment:
-  sdk: ">=2.12.0 <4.0.0"
-  flutter: ">=2.0.0"
+  sdk: ">=3.0.0 <4.0.0"
+  flutter: ">=3.7.0"
 
 flutter:
   plugin:
@@ -21,7 +23,8 @@ flutter:
         pluginClass: FFmpegKitFlutterPlugin
 
 dependencies:
-  ffmpeg_kit_flutter_platform_interface: ^0.2.1
+  ffmpeg_kit_flutter_platform_interface:
+    path: ../flutter_platform_interface
   flutter:
     sdk: flutter
 
