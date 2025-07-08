@@ -147,8 +147,8 @@ public class FFmpegKitFlutterPlugin: NSObject, FlutterPlugin, FlutterStreamHandl
 
   public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
     let arguments = call.arguments as? [String: Any]
-    let sessionId = arguments?[argumentSessionId] as? Int
-    let waitTimeout = arguments?[argumentWaitTimeout] as? Int
+    let sessionId = (arguments?[argumentSessionId] as? NSNumber)?.intValue
+    let waitTimeout = (arguments?[argumentWaitTimeout] as? NSNumber)?.intValue
     let argumentsArray = arguments?[argumentArguments] as? [Any]
     let ffprobeJsonOutput = arguments?[argumentFfprobeJsonOutput] as? String
 
@@ -374,7 +374,7 @@ public class FFmpegKitFlutterPlugin: NSObject, FlutterPlugin, FlutterStreamHandl
   static func toLogDictionary(log: Log?) -> [String: Any]? {
     guard let log = log else { return nil }
     return [
-      keyLogSessionId: NSNumber(value: log.getId()),
+      keyLogSessionId: NSNumber(value: log.getSessionId()),
       keyLogLevel: NSNumber(value: log.getLevel()),
       keyLogMessage: log.getMessage(),
     ]
@@ -383,7 +383,7 @@ public class FFmpegKitFlutterPlugin: NSObject, FlutterPlugin, FlutterStreamHandl
   static func toStatisticsDictionary(statistics: Statistics?) -> [String: Any]? {
     guard let statistics = statistics else { return nil }
     return [
-      keyStatisticsSessionId: NSNumber(value: statistics.getId()),
+      keyStatisticsSessionId: NSNumber(value: statistics.getSessionId()),
       keyStatisticsVideoFrameNumber: NSNumber(value: statistics.getVideoFrameNumber()),
       keyStatisticsVideoFps: NSNumber(value: statistics.getVideoFps()),
       keyStatisticsVideoQuality: NSNumber(value: statistics.getVideoQuality()),
