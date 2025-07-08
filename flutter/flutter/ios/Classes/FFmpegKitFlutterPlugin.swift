@@ -74,7 +74,7 @@ public class FFmpegKitFlutterPlugin: NSObject, FlutterPlugin, FlutterStreamHandl
     print("FFmpegKitFlutterPlugin created.")
   }
 
-  func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink)
+  public func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink)
     -> FlutterError?
   {
     eventSink = events
@@ -83,7 +83,7 @@ public class FFmpegKitFlutterPlugin: NSObject, FlutterPlugin, FlutterStreamHandl
     return nil
   }
 
-  func onCancel(withArguments arguments: Any?) -> FlutterError? {
+  public func onCancel(withArguments arguments: Any?) -> FlutterError? {
     eventSink = nil
     return nil
   }
@@ -147,8 +147,8 @@ public class FFmpegKitFlutterPlugin: NSObject, FlutterPlugin, FlutterStreamHandl
 
   public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
     let arguments = call.arguments as? [String: Any]
-    let sessionId = arguments?[argumentSessionId] as? NSNumber
-    let waitTimeout = arguments?[argumentWaitTimeout] as? NSNumber
+    let sessionId = arguments?[argumentSessionId] as? Int
+    let waitTimeout = arguments?[argumentWaitTimeout] as? Int
     let argumentsArray = arguments?[argumentArguments] as? [Any]
     let ffprobeJsonOutput = arguments?[argumentFfprobeJsonOutput] as? String
 
@@ -240,7 +240,7 @@ public class FFmpegKitFlutterPlugin: NSObject, FlutterPlugin, FlutterStreamHandl
 
   // MARK: - Session Methods
   private func abstractSessionGetEndTime(sessionId: NSNumber, result: @escaping FlutterResult) {
-    guard let session = FFmpegKitConfig.getSession(sessionId.int64Value) as? AbstractSession else {
+    guard let session = FFmpegKitConfig.getSession(sessionId) as? AbstractSession else {
       result(FlutterError(code: "SESSION_NOT_FOUND", message: "Session not found.", details: nil))
       return
     }
@@ -251,8 +251,8 @@ public class FFmpegKitFlutterPlugin: NSObject, FlutterPlugin, FlutterStreamHandl
     }
   }
 
-  private func abstractSessionGetDuration(sessionId: NSNumber, result: @escaping FlutterResult) {
-    guard let session = FFmpegKitConfig.getSession(sessionId.int64Value) as? AbstractSession else {
+  private func abstractSessionGetDuration(sessionId: Int, result: @escaping FlutterResult) {
+    guard let session = FFmpegKitConfig.getSession(sessionId) as? AbstractSession else {
       result(FlutterError(code: "SESSION_NOT_FOUND", message: "Session not found.", details: nil))
       return
     }
@@ -260,15 +260,15 @@ public class FFmpegKitFlutterPlugin: NSObject, FlutterPlugin, FlutterStreamHandl
   }
 
   private func abstractSessionGetAllLogs(
-    sessionId: NSNumber, timeout: NSNumber?, result: @escaping FlutterResult
+    sessionId: NSNumber, timeout: Int?, result: @escaping FlutterResult
   ) {
-    guard let session = FFmpegKitConfig.getSession(sessionId.int64Value) as? AbstractSession else {
+    guard let session = FFmpegKitConfig.getSession(sessionId) as? AbstractSession else {
       result(FlutterError(code: "SESSION_NOT_FOUND", message: "Session not found.", details: nil))
       return
     }
     let timeoutValue =
       Self.isValidPositiveNumber(value: timeout)
-      ? timeout!.intValue : AbstractSessionDefaultTimeoutForAsynchronousMessagesInTransmit
+      ? timeout! : AbstractSessionDefaultTimeoutForAsynchronousMessagesInTransmit
     let allLogs = session.getAllLogs(withTimeout: timeoutValue)
     result(Self.toLogArray(logs: allLogs))
   }
@@ -276,14 +276,14 @@ public class FFmpegKitFlutterPlugin: NSObject, FlutterPlugin, FlutterStreamHandl
   private func ffmpegSession(arguments: [Any], result: @escaping FlutterResult) {
     let session = FFmpegSession.create(
       arguments, withCompleteCallback: nil, withLogCallback: nil, withStatisticsCallback: nil,
-      withLogRedirectionStrategy: .neverPrintLogs)
+      with: .neverPrintLogs)
     result(Self.toSessionDictionary(session: session))
   }
 
   private func ffprobeSession(arguments: [Any], result: @escaping FlutterResult) {
     let session = FFprobeSession.create(
       arguments, withCompleteCallback: nil, withLogCallback: nil,
-      withLogRedirectionStrategy: .neverPrintLogs)
+      with: .neverPrintLogs)
     result(Self.toSessionDictionary(session: session))
   }
 
@@ -293,8 +293,8 @@ public class FFmpegKitFlutterPlugin: NSObject, FlutterPlugin, FlutterStreamHandl
     result(Self.toSessionDictionary(session: session))
   }
 
-  private func getMediaInformation(sessionId: NSNumber, result: @escaping FlutterResult) {
-    guard let session = FFmpegKitConfig.getSession(sessionId.int64Value) as? AbstractSession else {
+  private func getMediaInformation(sessionId: Int, result: @escaping FlutterResult) {
+    guard let session = FFmpegKitConfig.getSession(sessionId) as? AbstractSession else {
       result(FlutterError(code: "SESSION_NOT_FOUND", message: "Session not found.", details: nil))
       return
     }
@@ -314,7 +314,7 @@ public class FFmpegKitFlutterPlugin: NSObject, FlutterPlugin, FlutterStreamHandl
     ffprobeJsonOutput: String, result: @escaping FlutterResult
   ) {
     do {
-      let mediaInformation = try MediaInformationJsonParser.from(withError: ffprobeJsonOutput)
+      let mediaInformation = try MediaInformationJsonParser.fromWithError(ffprobeJsonOutput)
       result(Self.toMediaInformationDictionary(mediaInformation: mediaInformation))
     } catch {
       print("Parsing MediaInformation failed: $error)")
@@ -349,7 +349,7 @@ public class FFmpegKitFlutterPlugin: NSObject, FlutterPlugin, FlutterStreamHandl
   static func toSessionDictionary(session: Session?) -> [String: Any]? {
     guard let session = session else { return nil }
     var dictionary: [String: Any] = [
-      keySessionId: NSNumber(value: session.getSessionId()),
+      keySessionId: NSNumber(value: session.getId()),
       keySessionCreateTime: NSNumber(
         value: Int64(session.getCreateTime().timeIntervalSince1970 * 1000)),
       keySessionStartTime: NSNumber(
@@ -374,7 +374,7 @@ public class FFmpegKitFlutterPlugin: NSObject, FlutterPlugin, FlutterStreamHandl
   static func toLogDictionary(log: Log?) -> [String: Any]? {
     guard let log = log else { return nil }
     return [
-      keyLogSessionId: NSNumber(value: log.getSessionId()),
+      keyLogSessionId: NSNumber(value: log.getId()),
       keyLogLevel: NSNumber(value: log.getLevel()),
       keyLogMessage: log.getMessage(),
     ]
@@ -383,7 +383,7 @@ public class FFmpegKitFlutterPlugin: NSObject, FlutterPlugin, FlutterStreamHandl
   static func toStatisticsDictionary(statistics: Statistics?) -> [String: Any]? {
     guard let statistics = statistics else { return nil }
     return [
-      keyStatisticsSessionId: NSNumber(value: statistics.getSessionId()),
+      keyStatisticsSessionId: NSNumber(value: statistics.getId()),
       keyStatisticsVideoFrameNumber: NSNumber(value: statistics.getVideoFrameNumber()),
       keyStatisticsVideoFps: NSNumber(value: statistics.getVideoFps()),
       keyStatisticsVideoQuality: NSNumber(value: statistics.getVideoQuality()),
