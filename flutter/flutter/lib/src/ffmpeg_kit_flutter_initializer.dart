@@ -51,9 +51,6 @@ class FFmpegKitInitializer {
   StreamSubscription? _eventSubscription;
 
   static Future<bool> initialize([bool refresh = false]) async {
-    if (!_initialized || refresh) {
-      _instance._updateEventSubscription();
-    }
     if (!_initialized) {
       _initialized = true;
       await _instance._initialize();
