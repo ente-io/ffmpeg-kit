@@ -329,9 +329,13 @@ class FFmpegKitInitializer {
   }
 
   Future<void> _updateEventSubscription() async {
-    await _eventSubscription?.cancel();
+    try {
+      await _eventSubscription?.cancel();
+    } finally {}
+    try {
     _eventSubscription = _eventChannel
         .receiveBroadcastStream()
         .listen(_onEvent, onError: _onError);
+    } finally {}
   }
 }
