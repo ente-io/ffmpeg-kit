@@ -34,13 +34,13 @@ class FFmpegKit {
   /// Synchronously executes FFmpeg command provided. Space character is used
   /// to split command into arguments. You can use single or double quote
   /// characters to specify arguments inside your command.
-  static Future<FFmpegSession> execute(String command, bool refresh) async =>
+  static Future<FFmpegSession> execute(String command, [bool refresh = false]) async =>
       FFmpegKit.executeWithArguments(
           FFmpegKitConfig.parseArguments(command), refresh);
 
   /// Synchronously executes FFmpeg with arguments provided.
   static Future<FFmpegSession> executeWithArguments(
-      List<String> commandArguments, bool refresh) async {
+      List<String> commandArguments, [bool refresh = false]) async {
     final session =
         await FFmpegSession.create(commandArguments, null, null, null, null);
 
