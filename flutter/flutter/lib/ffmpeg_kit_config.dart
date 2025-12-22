@@ -631,8 +631,6 @@ class FFmpegKitConfig {
         return "FAILED";
       case SessionState.completed:
         return "COMPLETED";
-      default:
-        return "";
     }
   }
 

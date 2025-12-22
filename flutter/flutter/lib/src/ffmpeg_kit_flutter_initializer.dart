@@ -49,8 +49,6 @@ class FFmpegKitInitializer {
   static FFmpegKitInitializer _instance = new FFmpegKitInitializer();
 
   static bool _initialized = false;
-  StreamSubscription? _eventSubscription;
-
   static Future<bool> initialize([bool refresh = false]) async {
     if (!_initialized) {
       _initialized = true;
@@ -338,13 +336,18 @@ class FFmpegKitInitializer {
   Future<void> _initialize() async {
     print("Loading ffmpeg-kit-flutter.");
 
+    BinaryMessenger? messenger;
     try {
-      _eventSubscription = _eventChannel
-          .receiveBroadcastStream()
-          .listen(_onEvent, onError: _onError);
-    } on Exception catch (e) {
-      print("EventChannel unavailable in this isolate: $e");
-      _eventSubscription = null;
+      messenger = ServicesBinding.instance.defaultBinaryMessenger;
+    } on Exception {
+      messenger = null;
+    }
+
+    if (messenger is! BackgroundIsolateBinaryMessenger) {
+      _eventChannel.receiveBroadcastStream().listen(
+            _onEvent,
+            onError: _onError,
+          );
     }
 
     final logLevel = await _getLogLevel();
