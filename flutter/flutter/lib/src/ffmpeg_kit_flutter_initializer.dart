@@ -19,6 +19,7 @@
 
 import 'dart:async';
 import 'dart:io';
+import 'dart:isolate';
 
 import 'package:ffmpeg_kit_flutter_platform_interface/ffmpeg_kit_flutter_platform_interface.dart';
 import 'package:flutter/services.dart';
@@ -212,6 +213,33 @@ class FFmpegKitInitializer {
   void _processCompleteCallbackEvent(Map<dynamic, dynamic> event) {
     final int sessionId = event["sessionId"];
 
+    // Check for SendPort first (for cross-isolate support)
+    final SendPort? completionPort =
+        FFmpegKitFactory.getCompletionPort(sessionId);
+    if (completionPort != null) {
+      FFmpegKitConfig.getSession(sessionId).then((Session? session) async {
+        if (session != null) {
+          final returnCode = await session.getReturnCode();
+          final output = await session.getOutput();
+          completionPort.send({
+            "sessionId": sessionId,
+            "returnCode": returnCode?.getValue(),
+            "output": output,
+          });
+          FFmpegKitFactory.removeCompletionPort(sessionId);
+        } else {
+          completionPort.send({
+            "sessionId": sessionId,
+            "returnCode": null,
+            "output": null,
+          });
+          FFmpegKitFactory.removeCompletionPort(sessionId);
+        }
+      });
+      return;
+    }
+
+    // Existing callback-based handling
     FFmpegKitConfig.getSession(sessionId).then((Session? session) {
       if (session != null) {
         if (session.isFFmpeg()) {
@@ -310,6 +338,15 @@ class FFmpegKitInitializer {
   Future<void> _initialize() async {
     print("Loading ffmpeg-kit-flutter.");
 
+    try {
+      _eventSubscription = _eventChannel
+          .receiveBroadcastStream()
+          .listen(_onEvent, onError: _onError);
+    } on Exception catch (e) {
+      print("EventChannel unavailable in this isolate: $e");
+      _eventSubscription = null;
+    }
+
     final logLevel = await _getLogLevel();
     if (logLevel != null) {
       FFmpegKitConfig.setLogLevel(logLevel);
@@ -323,12 +360,5 @@ class FFmpegKitInitializer {
 
     final fullVersion = "$platform-$packageName-$arch-$version$isLTSPostfix";
     print("Loaded ffmpeg-kit-flutter-$fullVersion.");
-  }
-
-  Future<void> _updateEventSubscription() async {
-    await _eventSubscription?.cancel();
-    _eventSubscription = _eventChannel
-        .receiveBroadcastStream()
-        .listen(_onEvent, onError: _onError);
   }
 }

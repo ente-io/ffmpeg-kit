@@ -17,6 +17,8 @@
  * along with FFmpegKit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import 'dart:isolate';
+
 import 'package:ffmpeg_kit_flutter_platform_interface/ffmpeg_kit_flutter_platform_interface.dart';
 import 'package:flutter/services.dart';
 
@@ -34,13 +36,15 @@ class FFmpegKit {
   /// Synchronously executes FFmpeg command provided. Space character is used
   /// to split command into arguments. You can use single or double quote
   /// characters to specify arguments inside your command.
-  static Future<FFmpegSession> execute(String command, [bool refresh = false]) async =>
+  static Future<FFmpegSession> execute(String command,
+          [bool refresh = false]) async =>
       FFmpegKit.executeWithArguments(
           FFmpegKitConfig.parseArguments(command), refresh);
 
   /// Synchronously executes FFmpeg with arguments provided.
   static Future<FFmpegSession> executeWithArguments(
-      List<String> commandArguments, [bool refresh = false]) async {
+      List<String> commandArguments,
+      [bool refresh = false]) async {
     final session =
         await FFmpegSession.create(commandArguments, null, null, null, null);
 
@@ -79,6 +83,15 @@ class FFmpegKit {
     await FFmpegKitConfig.asyncFFmpegExecute(session);
 
     return session;
+  }
+
+  /// Registers a completion port for an existing session.
+  ///
+  /// Useful when the session is created in a spawned isolate but the
+  /// completion port must be registered on the root isolate.
+  static void registerSessionCompletionPort(
+      int sessionId, SendPort completionPort) {
+    FFmpegKitFactory.setCompletionPort(sessionId, completionPort);
   }
 
   /// Cancels the session specified with [sessionId].

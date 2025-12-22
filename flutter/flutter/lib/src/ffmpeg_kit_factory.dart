@@ -17,6 +17,8 @@
  * along with FFmpegKit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import 'dart:isolate';
+
 import '../abstract_session.dart';
 import '../ffmpeg_session_complete_callback.dart';
 import '../ffprobe_session_complete_callback.dart';
@@ -38,6 +40,7 @@ final mediaInformationSessionCompleteCallbackMap =
 final logCallbackMap = new Map<int, LogCallback>();
 final statisticsCallbackMap = new Map<int, StatisticsCallback>();
 final logRedirectionStrategyMap = new Map<int, LogRedirectionStrategy>();
+final completionPortMap = new Map<int, SendPort>();
 
 class FFmpegKitFactory {
   static LogCallback? _logCallback;
@@ -209,6 +212,24 @@ class FFmpegKitFactory {
       return null;
     } else {
       return DateTime.fromMillisecondsSinceEpoch(time, isUtc: false);
+    }
+  }
+
+  /// Get completion port for cross-isolate FFmpeg completion notification.
+  static SendPort? getCompletionPort(int? sessionId) =>
+      completionPortMap[sessionId];
+
+  /// Set completion port for cross-isolate FFmpeg completion notification.
+  static void setCompletionPort(int? sessionId, SendPort? port) {
+    if (sessionId != null && port != null) {
+      completionPortMap[sessionId] = port;
+    }
+  }
+
+  /// Remove completion port after use.
+  static void removeCompletionPort(int? sessionId) {
+    if (sessionId != null) {
+      completionPortMap.remove(sessionId);
     }
   }
 }
