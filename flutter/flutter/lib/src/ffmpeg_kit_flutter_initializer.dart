@@ -336,14 +336,12 @@ class FFmpegKitInitializer {
   Future<void> _initialize() async {
     print("Loading ffmpeg-kit-flutter.");
 
-    BinaryMessenger? messenger;
-    try {
-      messenger = ServicesBinding.instance.defaultBinaryMessenger;
-    } on Object {
-      messenger = null;
+    if (RootIsolateToken.instance == null) {
+      return;
     }
 
-    if (messenger is! BackgroundIsolateBinaryMessenger) {
+    if (ServicesBinding.instance.defaultBinaryMessenger
+        is! BackgroundIsolateBinaryMessenger) {
       _eventChannel.receiveBroadcastStream().listen(
             _onEvent,
             onError: _onError,
