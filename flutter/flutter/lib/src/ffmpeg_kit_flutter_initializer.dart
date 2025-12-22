@@ -339,7 +339,7 @@ class FFmpegKitInitializer {
     BinaryMessenger? messenger;
     try {
       messenger = ServicesBinding.instance.defaultBinaryMessenger;
-    } on Exception {
+    } on Object {
       messenger = null;
     }
 
