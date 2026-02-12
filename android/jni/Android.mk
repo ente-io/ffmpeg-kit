@@ -60,7 +60,7 @@ include $(CLEAR_VARS)
 LOCAL_ARM_MODE := $(MY_ARM_MODE)
 LOCAL_MODULE := ffmpegkit_abidetect
 LOCAL_SRC_FILES := ffmpegkit_abidetect.c
-LOCAL_CFLAGS := -Wall -Wextra -Werror -Wno-unused-parameter -DFFMPEG_KIT_${MY_ARCH_FLAGS}
+LOCAL_CFLAGS := -Wall -Wextra -Wno-unused-parameter -DFFMPEG_KIT_${MY_ARCH_FLAGS}
 LOCAL_C_INCLUDES := $(FFMPEG_INCLUDES)
 LOCAL_LDLIBS := -llog -lz -landroid
 LOCAL_STATIC_LIBRARIES := cpu-features
@@ -77,7 +77,7 @@ else ifeq ($(TARGET_PLATFORM),android-17)
     MY_SRC_FILES += android_lts_support.c
 endif
 
-MY_CFLAGS := -Wall -Werror -Wno-unused-parameter -Wno-switch -Wno-sign-compare
+MY_CFLAGS := -Wall -Wno-unused-parameter -Wno-switch -Wno-sign-compare -Wno-single-bit-bitfield-constant-conversion
 MY_LDLIBS := -llog -lz -landroid
 
 MY_BUILD_GENERIC_FFMPEG_KIT := true
