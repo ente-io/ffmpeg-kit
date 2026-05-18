@@ -2,8 +2,21 @@ name: android build
 
 on:
   workflow_dispatch:
+  pull_request:
+    branches:
+      - development
+      - main
+      - 16kb-fix
+    paths:
+      - '.github/workflows/build-android.yml'
+      - 'android/**'
+      - '!android/README.md'
+      - 'flutter/flutter/android/**'
+      - 'scripts/**'
+      - 'tools/**'
+      - 'android.sh'
   push:
-    tags: 
+    tags:
       - '*'
 
 jobs:
@@ -12,15 +25,12 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        ndk-version: [ 'r25b-linux' ]
-        branches: [ 'development' ]
+        ndk-version: [ 'r26d-linux' ]
     defaults:
       run:
         shell: bash
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ matrix.branches }}
       - name: set up adopt jdk 17
         uses: actions/setup-java@v3
         with:
@@ -39,8 +49,21 @@ jobs:
           curl -s "https://dl.google.com/android/repository/android-ndk-${{ matrix.ndk-version }}.zip" -o ndk.zip
           unzip -q -o ndk.zip -d .ndk
           echo "ANDROID_NDK_ROOT=$PWD/.ndk/$(ls .ndk)" >> $GITHUB_ENV
+          echo "$PWD/.ndk/$(ls .ndk)/toolchains/llvm/prebuilt/linux-x86_64/bin" >> $GITHUB_PATH
       - name: run the build script
-        run: ./android.sh --enable-gpl --enable-android-zlib --enable-zimg --enable-x264
+        env:
+          APP_ALLOW_MISSING_DEPS: "true"
+        run: ./android.sh --enable-gpl --enable-android-zlib --enable-zimg --enable-x264 --disable-x86 --disable-x86-64
+      - name: validate android aar
+        env:
+          REQUIRE_CI_PATH: "1"
+        run: scripts/validate-android-aar.sh prebuilt/bundle-android-aar/ffmpeg-kit/ffmpeg-kit.aar
+      - name: upload android aar
+        uses: actions/upload-artifact@v4
+        with:
+          name: ffmpeg-kit-android-aar
+          path: prebuilt/bundle-android-aar/ffmpeg-kit/ffmpeg-kit.aar
+          if-no-files-found: error
       - name: Upload Release Asset (.integrity)
         id: upload-release-asset-integrity
         uses: ncipollo/release-action@v1
